@@ -92,31 +92,72 @@ local function buildFallbackLibrary()
         return widget
     end
 
-    local function createLabel(parent, text, size, pos, textColor)
+    local function createLabel(parent, text, size, pos, textColor, textSize)
         local label = Instance.new("TextLabel")
         label.BackgroundTransparency = 1
         label.Text = tostring(text)
         label.Size = size
         label.Position = pos
-        label.Font = Enum.Font.GothamBold
-        label.TextSize = 14
+        label.Font = Enum.Font.GothamSemibold
+        label.TextSize = textSize or 13
         label.TextColor3 = textColor or Color3.fromRGB(255, 255, 255)
         label.TextXAlignment = Enum.TextXAlignment.Left
         label.Parent = parent
         return label
     end
 
+    local function makeCorner(obj, radius)
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, radius or 12)
+        corner.Parent = obj
+        return corner
+    end
+
+    local function makeStroke(obj, color, thickness)
+        local stroke = Instance.new("UIStroke")
+        stroke.Color = color or Color3.fromRGB(255, 80, 80)
+        stroke.Thickness = thickness or 1
+        stroke.Transparency = 0.15
+        stroke.Parent = obj
+        return stroke
+    end
+
     local function createButton(parent, text, size, pos, callback)
         local button = Instance.new("TextButton")
         button.Size = size
         button.Position = pos
-        button.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+        button.BackgroundColor3 = Color3.fromRGB(46, 18, 18)
         button.TextColor3 = Color3.fromRGB(255, 255, 255)
-        button.Font = Enum.Font.GothamBold
-        button.TextSize = 14
+        button.Font = Enum.Font.GothamSemibold
+        button.TextSize = 13
         button.Text = tostring(text)
         button.AutoButtonColor = false
+        button.BorderSizePixel = 0
         button.Parent = parent
+        makeCorner(button, 10)
+        makeStroke(button, Color3.fromRGB(255, 72, 72), 1)
+
+        local defaultColor = button.BackgroundColor3
+        local hoverColor = Color3.fromRGB(73, 23, 23)
+        local pressColor = Color3.fromRGB(255, 66, 66)
+
+        button.MouseEnter:Connect(function()
+            if button.Active then
+                button.BackgroundColor3 = hoverColor
+            end
+        end)
+        button.MouseLeave:Connect(function()
+            if button.Active then
+                button.BackgroundColor3 = defaultColor
+            end
+        end)
+        button.MouseButton1Down:Connect(function()
+            button.BackgroundColor3 = pressColor
+        end)
+        button.MouseButton1Up:Connect(function()
+            button.BackgroundColor3 = hoverColor
+        end)
+
         if callback then button.MouseButton1Click:Connect(callback) end
         return button
     end
@@ -127,11 +168,13 @@ local function buildFallbackLibrary()
         frame.Name = name or "Group"
         frame.Size = UDim2.new(1, 0, 0, 0)
         frame.AutomaticSize = Enum.AutomaticSize.Y
-        frame.BackgroundColor3 = Color3.fromRGB(35, 20, 20)
+        frame.BackgroundColor3 = Color3.fromRGB(28, 15, 15)
         frame.BorderSizePixel = 0
         frame.Parent = parent
+        makeCorner(frame, 14)
+        makeStroke(frame, Color3.fromRGB(255, 72, 72), 1)
 
-        local title = createLabel(frame, name or "", UDim2.new(1, -20, 0, 24), UDim2.new(0, 10, 0, 8), Color3.fromRGB(255, 80, 80))
+        local title = createLabel(frame, name or "", UDim2.new(1, -20, 0, 24), UDim2.new(0, 12, 0, 9), Color3.fromRGB(255, 96, 96), 13)
         if not name or name == "" or name == " " then title.Visible = false end
 
         local list = Instance.new("UIListLayout")
@@ -140,29 +183,31 @@ local function buildFallbackLibrary()
         list.Parent = frame
 
         local padding = Instance.new("UIPadding")
-        padding.PaddingTop = UDim.new(0, 8)
-        padding.PaddingBottom = UDim.new(0, 8)
-        padding.PaddingLeft = UDim.new(0, 8)
-        padding.PaddingRight = UDim.new(0, 8)
+        padding.PaddingTop = UDim.new(0, 10)
+        padding.PaddingBottom = UDim.new(0, 10)
+        padding.PaddingLeft = UDim.new(0, 10)
+        padding.PaddingRight = UDim.new(0, 10)
         padding.Parent = frame
 
         function group:AddToggle(id, setting)
             local widget = makeWidget()
-            local toggle = createButton(frame, id or "Toggle", UDim2.new(1, 0, 0, 28), UDim2.new(0, 0, 0, 0), function()
+            local toggle = createButton(frame, tostring(id or "Toggle"), UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 0), function()
                 local enabled = not (widget.Value == true)
                 widget.Value = enabled
                 if widget.Callback then widget.Callback(enabled) end
                 toggle.Text = (enabled and "[ON] " or "[OFF] ") .. tostring(id or "Toggle")
+                toggle.BackgroundColor3 = enabled and Color3.fromRGB(76, 28, 28) or Color3.fromRGB(46, 18, 18)
             end)
             widget.Value = setting and setting.Default == true
             toggle.Text = (widget.Value and "[ON] " or "[OFF] ") .. tostring(id or "Toggle")
+            toggle.BackgroundColor3 = widget.Value and Color3.fromRGB(76, 28, 28) or Color3.fromRGB(46, 18, 18)
             return widget
         end
 
         function group:AddButton(setting, cb)
             local widget = makeWidget()
             local label = type(setting) == "string" and setting or (setting and (setting.Title or setting.Text) or "Button")
-            local btn = createButton(frame, tostring(label), UDim2.new(1, 0, 0, 28), UDim2.new(0, 0, 0, 0), function()
+            local btn = createButton(frame, tostring(label), UDim2.new(1, 0, 0, 30), UDim2.new(0, 0, 0, 0), function()
                 if widget.Callback then widget.Callback()
                 elseif type(cb) == "function" then cb() end
             end)
@@ -177,7 +222,7 @@ local function buildFallbackLibrary()
         function group:AddDropdown(id, setting)
             local widget = makeWidget()
             widget.Value = setting and setting.Default or "Select"
-            local label = createLabel(frame, tostring(id or "Dropdown") .. " : " .. tostring(widget.Value), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0))
+            local label = createLabel(frame, tostring(id or "Dropdown") .. " : " .. tostring(widget.Value), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0), Color3.fromRGB(245, 245, 245), 12)
             widget.Label = label
             return widget
         end
@@ -185,7 +230,7 @@ local function buildFallbackLibrary()
         function group:AddSlider(id, setting)
             local widget = makeWidget()
             widget.Value = setting and setting.Default or 0
-            local label = createLabel(frame, tostring((setting and setting.Title) or id or "Slider") .. " : " .. tostring(widget.Value), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0))
+            local label = createLabel(frame, tostring((setting and setting.Title) or id or "Slider") .. " : " .. tostring(widget.Value), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0), Color3.fromRGB(245, 245, 245), 12)
             widget.Label = label
             return widget
         end
@@ -193,13 +238,16 @@ local function buildFallbackLibrary()
         function group:AddInput(id, setting)
             local widget = makeWidget()
             local input = Instance.new("TextBox")
-            input.Size = UDim2.new(1, 0, 0, 28)
-            input.BackgroundColor3 = Color3.fromRGB(45, 15, 15)
+            input.Size = UDim2.new(1, 0, 0, 30)
+            input.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
             input.TextColor3 = Color3.fromRGB(255, 255, 255)
             input.PlaceholderText = tostring(id or "Input")
             input.Font = Enum.Font.Gotham
             input.TextSize = 14
+            input.BorderSizePixel = 0
             input.Parent = frame
+            makeCorner(input, 10)
+            makeStroke(input, Color3.fromRGB(255, 80, 80), 1)
             widget.Value = setting and setting.Default or ""
             input.Text = tostring(widget.Value)
             input.FocusLost:Connect(function(enterPressed)
@@ -213,14 +261,15 @@ local function buildFallbackLibrary()
 
         function group:AddParagraph(setting)
             local txt = setting and (setting.Title or setting.Description or setting.Text or "") or ""
-            local label = createLabel(frame, tostring(txt), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0))
+            local label = createLabel(frame, tostring(txt), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0), Color3.fromRGB(220, 220, 220), 12)
             label.TextWrapped = true
             label.TextSize = 12
+            label.TextYAlignment = Enum.TextYAlignment.Top
             return { Label = label, SetDesc = function(_, d) label.Text = tostring(d) end }
         end
 
         function group:AddLabel(text)
-            local label = createLabel(frame, tostring(text), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0))
+            local label = createLabel(frame, tostring(text), UDim2.new(1, 0, 0, 24), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), 12)
             return { Label = label, SetText = function(_, t) label.Text = tostring(t) end }
         end
 
@@ -231,14 +280,18 @@ local function buildFallbackLibrary()
     lib.Notify = function(_, info)
         if not info then return end
         local notify = Instance.new("TextLabel")
-        notify.Size = UDim2.new(0, 260, 0, 48)
+        notify.Size = UDim2.new(0, 260, 0, 52)
         notify.Position = UDim2.new(0.5, -130, 0.05, 0)
-        notify.BackgroundColor3 = Color3.fromRGB(50, 10, 10)
+        notify.BackgroundColor3 = Color3.fromRGB(32, 12, 12)
         notify.TextColor3 = Color3.fromRGB(255, 255, 255)
         notify.Text = tostring(info.Title or "john doe") .. "\n" .. tostring(info.Description or "")
         notify.Font = Enum.Font.GothamBold
         notify.TextSize = 13
+        notify.TextWrapped = true
+        notify.BorderSizePixel = 0
         notify.Parent = PlayerGui
+        makeCorner(notify, 12)
+        makeStroke(notify, Color3.fromRGB(255, 72, 72), 1)
         task.delay(info.Duration or 3, function() if notify and notify.Parent then notify:Destroy() end end)
     end
 
@@ -251,54 +304,69 @@ local function buildFallbackLibrary()
 
         local bg = Instance.new("Frame")
         bg.Name = "Main"
-        bg.Size = UDim2.new(0, 560, 0, 420)
-        bg.Position = UDim2.new(0.5, -280, 0.5, -210)
-        bg.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
-        bg.BorderSizePixel = 2
-        bg.BorderColor3 = Color3.fromRGB(255, 40, 40)
+        bg.Size = UDim2.new(0, 560, 0, 430)
+        bg.Position = UDim2.new(0.5, -280, 0.5, -215)
+        bg.BackgroundColor3 = Color3.fromRGB(17, 9, 9)
+        bg.BorderSizePixel = 0
         bg.Parent = gui
+        makeCorner(bg, 18)
+        makeStroke(bg, Color3.fromRGB(255, 70, 70), 1)
 
         local toggleBtn = Instance.new("TextButton")
         toggleBtn.Name = "OpenMenuButton"
-        toggleBtn.Size = UDim2.new(0, 110, 0, 32)
-        toggleBtn.Position = UDim2.new(0, 15, 0.5, -16)
-        toggleBtn.BackgroundColor3 = Color3.fromRGB(150, 20, 20)
+        toggleBtn.Size = UDim2.new(0, 118, 0, 34)
+        toggleBtn.Position = UDim2.new(0, 14, 0.5, -17)
+        toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 20, 20)
         toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-        toggleBtn.Text = "John Doe Red"
+        toggleBtn.Text = "John Doe"
         toggleBtn.Font = Enum.Font.GothamBold
         toggleBtn.TextSize = 12
+        toggleBtn.AutoButtonColor = false
+        toggleBtn.BorderSizePixel = 0
         toggleBtn.Parent = gui
+        makeCorner(toggleBtn, 12)
+        makeStroke(toggleBtn, Color3.fromRGB(255, 96, 96), 1)
 
         toggleBtn.MouseButton1Click:Connect(function() bg.Visible = not bg.Visible end)
 
         local header = Instance.new("Frame")
         header.Name = "Header"
-        header.Size = UDim2.new(1, 0, 0, 42)
-        header.BackgroundColor3 = Color3.fromRGB(40, 12, 12)
+        header.Size = UDim2.new(1, 0, 0, 46)
+        header.BackgroundColor3 = Color3.fromRGB(38, 12, 12)
+        header.BorderSizePixel = 0
         header.Parent = bg
+        makeCorner(header, 18)
 
         local title = Instance.new("TextLabel")
-        title.Size = UDim2.new(1, -100, 1, 0)
+        title.Size = UDim2.new(1, -110, 1, 0)
         title.Position = UDim2.new(0, 15, 0, 0)
         title.BackgroundTransparency = 1
         title.Font = Enum.Font.GothamBold
         title.TextSize = 18
-        title.TextColor3 = Color3.fromRGB(255, 60, 60)
+        title.TextColor3 = Color3.fromRGB(255, 75, 75)
         title.Text = tostring(opts and opts.Title or "john doe RED")
         title.TextXAlignment = Enum.TextXAlignment.Left
         title.Parent = header
 
+        local dot = Instance.new("Frame")
+        dot.Size = UDim2.new(0, 9, 0, 9)
+        dot.Position = UDim2.new(1, -26, 0.5, -4.5)
+        dot.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
+        dot.BorderSizePixel = 0
+        dot.Parent = header
+        makeCorner(dot, 99)
+
         local tabsFrame = Instance.new("Frame")
         tabsFrame.Name = "Tabs"
-        tabsFrame.Size = UDim2.new(1, -20, 1, -60)
-        tabsFrame.Position = UDim2.new(0, 10, 0, 50)
+        tabsFrame.Size = UDim2.new(1, -20, 1, -62)
+        tabsFrame.Position = UDim2.new(0, 10, 0, 52)
         tabsFrame.BackgroundTransparency = 1
         tabsFrame.Parent = bg
 
         local tabButtonContainer = Instance.new("ScrollingFrame")
         tabButtonContainer.Size = UDim2.new(1, 0, 0, 32)
         tabButtonContainer.BackgroundTransparency = 1
-        tabButtonContainer.ScrollBarThickness = 2
+        tabButtonContainer.ScrollBarThickness = 0
         tabButtonContainer.CanvasSize = UDim2.new(0, 0, 0, 0)
         tabButtonContainer.Parent = tabsFrame
 
@@ -308,7 +376,7 @@ local function buildFallbackLibrary()
         tabLayout.Parent = tabButtonContainer
 
         tabLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-            tabButtonContainer.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X, 0, 0)
+            tabButtonContainer.CanvasSize = UDim2.new(0, tabLayout.AbsoluteContentSize.X + 4, 0, 0)
         end)
 
         local activeTab = nil
@@ -318,6 +386,7 @@ local function buildFallbackLibrary()
         local function createTabInternal(tabData)
             local name = type(tabData) == "table" and tabData[1] or tostring(tabData)
             local btn = createButton(tabButtonContainer, tostring(name), UDim2.new(0, 110, 1, 0), UDim2.new(0, 0, 0, 0))
+            btn.BackgroundColor3 = Color3.fromRGB(52, 18, 18)
             table.insert(tabButtons, btn)
 
             local page = Instance.new("ScrollingFrame")
@@ -325,7 +394,7 @@ local function buildFallbackLibrary()
             page.Size = UDim2.new(1, 0, 1, -38)
             page.Position = UDim2.new(0, 0, 0, 38)
             page.BackgroundTransparency = 1
-            page.ScrollBarThickness = 5
+            page.ScrollBarThickness = 4
             page.Visible = false
             page.Parent = tabsFrame
 
@@ -333,9 +402,16 @@ local function buildFallbackLibrary()
             layout.Padding = UDim.new(0, 10)
             layout.Parent = page
 
+            local padding = Instance.new("UIPadding")
+            padding.PaddingTop = UDim.new(0, 8)
+            padding.PaddingBottom = UDim.new(0, 8)
+            padding.PaddingLeft = UDim.new(0, 8)
+            padding.PaddingRight = UDim.new(0, 8)
+            padding.Parent = page
+
             btn.MouseButton1Click:Connect(function()
-                for _, b in ipairs(tabButtons) do b.BackgroundColor3 = Color3.fromRGB(120, 20, 20) end
-                btn.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+                for _, b in ipairs(tabButtons) do b.BackgroundColor3 = Color3.fromRGB(52, 18, 18) end
+                btn.BackgroundColor3 = Color3.fromRGB(255, 66, 66)
                 if activeTab and activeTab.Frame then activeTab.Frame.Visible = false end
                 activeTab = { Frame = page }
                 page.Visible = true
@@ -345,11 +421,11 @@ local function buildFallbackLibrary()
             function tabObj:AddLeftGroupbox(label) return createGroup(page, label) end
             function tabObj:AddRightGroupbox(label) return createGroup(page, label) end
             function tabObj:AddSection(label) return createGroup(page, label) end
-            
+
             if not activeTab then
                 activeTab = { Frame = page }
                 page.Visible = true
-                btn.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
+                btn.BackgroundColor3 = Color3.fromRGB(255, 66, 66)
             end
             return tabObj
         end
