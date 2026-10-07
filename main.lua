@@ -469,6 +469,22 @@ if _libLoadOk and type(_libRes) == "string" and _libRes ~= "" then
     end
 end
 
+local function safeMakeCorner(obj, radius)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, radius or 12)
+    corner.Parent = obj
+    return corner
+end
+
+local function safeMakeStroke(obj, color, thickness)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = color or Color3.fromRGB(255, 80, 80)
+    stroke.Thickness = thickness or 1
+    stroke.Transparency = 0.15
+    stroke.Parent = obj
+    return stroke
+end
+
 Library = getgenv()._JohnDoeLib
 
 if not Library or not Library.CreateWindow then
@@ -478,6 +494,38 @@ end
 
 if not Library or not Library.CreateWindow then
     warn("[john doe hub] Không thể khởi tạo UI vì Library chưa sẵn sàng.")
+    local fallbackGui = Instance.new("ScreenGui")
+    fallbackGui.Name = "JohnDoeEmergencyUI"
+    fallbackGui.ResetOnSpawn = false
+    fallbackGui.IgnoreGuiInset = true
+    fallbackGui.DisplayOrder = 999
+    fallbackGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    fallbackGui.Parent = PlayerGui
+
+    local fallbackMain = Instance.new("Frame")
+    fallbackMain.Name = "Main"
+    fallbackMain.Size = UDim2.new(0, 260, 0, 120)
+    fallbackMain.Position = UDim2.new(0.5, -130, 0.5, -60)
+    fallbackMain.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
+    fallbackMain.BorderSizePixel = 0
+    fallbackMain.Parent = fallbackGui
+    safeMakeCorner(fallbackMain, 14)
+    safeMakeStroke(fallbackMain, Color3.fromRGB(255, 80, 80), 1)
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 1, -20)
+    label.Position = UDim2.new(0, 10, 0, 10)
+    label.BackgroundTransparency = 1
+    label.Text = "John Doe Hub\nUI failed to load\nPlease re-execute script."
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.TextWrapped = true
+    label.Parent = fallbackMain
+    Window = {
+        MakeTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+        AddTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+    }
     return
 end
 
@@ -486,14 +534,73 @@ if getgenv().UIColor then
     getgenv().UIColor["Main Color"] = Color3.fromRGB(255, 40, 40)
 end
 
-Window = Library:CreateWindow({
-    Title = "John Doe Hub - Red Edition",
-    Desc = "- Blox Fruit",
-    Image = JohnDoeLogo
-})
+local okCreate, createdWindow = pcall(function()
+    return Library:CreateWindow({
+        Title = "John Doe Hub - Red Edition",
+        Desc = "- Blox Fruit",
+        Image = JohnDoeLogo
+    })
+end)
+
+if not okCreate or not createdWindow then
+    warn("[john doe hub] CreateWindow trả về nil. Dùng fallback UI cấp cứu.")
+    local fallbackLib = buildFallbackLibrary()
+    if fallbackLib and fallbackLib.CreateWindow then
+        local okFallback, fallbackWindow = pcall(function()
+            return fallbackLib:CreateWindow({
+                Title = "John Doe Hub - Red Edition",
+                Desc = "- Blox Fruit",
+                Image = JohnDoeLogo
+            })
+        end)
+        if okFallback and fallbackWindow then
+            Window = fallbackWindow
+        else
+            local emergencyGui = Instance.new("ScreenGui")
+            emergencyGui.Name = "JohnDoeEmergencyUI"
+            emergencyGui.ResetOnSpawn = false
+            emergencyGui.IgnoreGuiInset = true
+            emergencyGui.DisplayOrder = 999
+            emergencyGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+            emergencyGui.Parent = PlayerGui
+
+            local emergencyMain = Instance.new("Frame")
+            emergencyMain.Name = "Main"
+            emergencyMain.Size = UDim2.new(0, 260, 0, 120)
+            emergencyMain.Position = UDim2.new(0.5, -130, 0.5, -60)
+            emergencyMain.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
+            emergencyMain.BorderSizePixel = 0
+            emergencyMain.Parent = emergencyGui
+            safeMakeCorner(emergencyMain, 14)
+            safeMakeStroke(emergencyMain, Color3.fromRGB(255, 80, 80), 1)
+
+            local emergencyLabel = Instance.new("TextLabel")
+            emergencyLabel.Size = UDim2.new(1, -20, 1, -20)
+            emergencyLabel.Position = UDim2.new(0, 10, 0, 10)
+            emergencyLabel.BackgroundTransparency = 1
+            emergencyLabel.Text = "John Doe Hub\nEmergency UI active\nPlease re-execute script."
+            emergencyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            emergencyLabel.Font = Enum.Font.GothamBold
+            emergencyLabel.TextSize = 14
+            emergencyLabel.TextWrapped = true
+            emergencyLabel.Parent = emergencyMain
+            Window = {
+                MakeTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+                AddTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+            }
+        end
+    else
+        Window = {
+            MakeTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+            AddTab = function() return { AddLeftGroupbox = function() return {} end, AddSection = function() return {} end } end,
+        }
+    end
+else
+    Window = createdWindow
+end
 
 if not Window then
-    warn("[john doe hub] CreateWindow trả về nil. UI không được khởi tạo.")
+    warn("[john doe hub] Không thể khởi tạo UI dù đã dùng fallback. Script dừng ở đây.")
     return
 end
 
