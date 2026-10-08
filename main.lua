@@ -124,8 +124,42 @@ local function ensureImmediateMenu()
     tabLayout.Parent = tabBar
 
     local tabs = { "Main", "Sea", "Item", "Settings" }
+    local tabButtons = {}
+    local selectedTab = "Main"
+    local function setSelectedTab(tabName)
+        selectedTab = tabName
+        for _, btn in ipairs(tabButtons) do
+            local active = btn.Name == tabName
+            btn.BackgroundColor3 = active and Color3.fromRGB(255, 90, 90) or Color3.fromRGB(52, 18, 18)
+        end
+
+        if leftTitle then
+            leftTitle.Text = tabName .. " Status"
+        end
+
+        if rightTitle then
+            rightTitle.Text = tabName .. " Quick"
+        end
+
+        local data = {
+            Main = { "[ON] Auto Farm", "[OFF] Auto Quest", "[OFF] No Clip" },
+            Sea = { "[ON] Sea Farm", "[OFF] Chest", "[OFF] Boss" },
+            Item = { "[ON] Auto Drop", "[OFF] Sell", "[OFF] Upgrade" },
+            Settings = { "[ON] Safe Mode", "[OFF] Debug", "[OFF] Theme" }
+        }
+
+        local rows = data[tabName] or data[Main]
+        for index, rowText in ipairs(rows) do
+            local rowButton = leftRows[index]
+            if rowButton then
+                rowButton.Text = rowText
+            end
+        end
+    end
+
     for i, name in ipairs(tabs) do
         local tabBtn = Instance.new("TextButton")
+        tabBtn.Name = name
         tabBtn.Size = UDim2.new(0, 120, 1, 0)
         tabBtn.BackgroundColor3 = i == 1 and Color3.fromRGB(255, 90, 90) or Color3.fromRGB(52, 18, 18)
         tabBtn.Text = name
@@ -134,6 +168,24 @@ local function ensureImmediateMenu()
         tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
         tabBtn.BorderSizePixel = 0
         tabBtn.Parent = tabBar
+
+        tabBtn.MouseEnter:Connect(function()
+            if tabBtn.Name ~= selectedTab then
+                tabBtn.BackgroundColor3 = Color3.fromRGB(92, 32, 32)
+            end
+        end)
+
+        tabBtn.MouseLeave:Connect(function()
+            if tabBtn.Name ~= selectedTab then
+                tabBtn.BackgroundColor3 = Color3.fromRGB(52, 18, 18)
+            end
+        end)
+
+        tabBtn.MouseButton1Click:Connect(function()
+            setSelectedTab(tabBtn.Name)
+        end)
+
+        table.insert(tabButtons, tabBtn)
 
         local tabCorner = Instance.new("UICorner")
         tabCorner.CornerRadius = UDim.new(0, 8)
@@ -188,13 +240,14 @@ local function ensureImmediateMenu()
     leftTitle.Size = UDim2.new(1, -20, 0, 22)
     leftTitle.Position = UDim2.new(0, 12, 0, 8)
     leftTitle.BackgroundTransparency = 1
-    leftTitle.Text = "Status"
+    leftTitle.Text = "Main Status"
     leftTitle.Font = Enum.Font.GothamBold
     leftTitle.TextSize = 13
     leftTitle.TextColor3 = Color3.fromRGB(255, 118, 118)
     leftTitle.TextXAlignment = Enum.TextXAlignment.Left
     leftTitle.Parent = leftPanel
 
+    local leftRows = {}
     local function makeRow(text, color, yPos)
         local row = Instance.new("TextButton")
         row.Size = UDim2.new(1, -20, 0, 28)
@@ -207,10 +260,19 @@ local function ensureImmediateMenu()
         row.BorderSizePixel = 0
         row.Parent = leftPanel
 
+        row.MouseEnter:Connect(function()
+            row.BackgroundColor3 = Color3.fromRGB(120, 30, 30)
+        end)
+
+        row.MouseLeave:Connect(function()
+            row.BackgroundColor3 = color
+        end)
+
         local rowCorner = Instance.new("UICorner")
         rowCorner.CornerRadius = UDim.new(0, 8)
         rowCorner.Parent = row
 
+        table.insert(leftRows, row)
         return row
     end
 
@@ -238,7 +300,7 @@ local function ensureImmediateMenu()
     rightTitle.Size = UDim2.new(1, -20, 0, 22)
     rightTitle.Position = UDim2.new(0, 12, 0, 8)
     rightTitle.BackgroundTransparency = 1
-    rightTitle.Text = "Quick" 
+    rightTitle.Text = "Main Quick"
     rightTitle.Font = Enum.Font.GothamBold
     rightTitle.TextSize = 13
     rightTitle.TextColor3 = Color3.fromRGB(255, 120, 120)
@@ -265,10 +327,20 @@ local function ensureImmediateMenu()
         btn.BorderSizePixel = 0
         btn.Parent = rightPanel
 
+        btn.MouseEnter:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(210, 50, 50)
+        end)
+
+        btn.MouseLeave:Connect(function()
+            btn.BackgroundColor3 = color
+        end)
+
         local btnCorner = Instance.new("UICorner")
         btnCorner.CornerRadius = UDim.new(0, 8)
         btnCorner.Parent = btn
     end
+
+    setSelectedTab(selectedTab)
 end
 
 
