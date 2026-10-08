@@ -39,61 +39,238 @@ local function ensureImmediateMenu()
 
     local main = Instance.new("Frame")
     main.Name = "Main"
-    main.Size = UDim2.new(0, 260, 0, 120)
-    main.Position = UDim2.new(0.5, -130, 0.5, -60)
-    main.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
+    main.Size = UDim2.new(0, 620, 0, 310)
+    main.Position = UDim2.new(0.5, -310, 0.5, -155)
+    main.BackgroundColor3 = Color3.fromRGB(20, 11, 13)
     main.BorderSizePixel = 0
     main.Parent = gui
 
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 16)
-    corner.Parent = main
+    local mainCorner = Instance.new("UICorner")
+    mainCorner.CornerRadius = UDim.new(0, 18)
+    mainCorner.Parent = main
 
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(255, 90, 90)
-    stroke.Thickness = 1
-    stroke.Parent = main
+    local mainStroke = Instance.new("UIStroke")
+    mainStroke.Color = Color3.fromRGB(255, 90, 90)
+    mainStroke.Thickness = 1.2
+    mainStroke.Parent = main
+
+    local topBar = Instance.new("Frame")
+    topBar.Size = UDim2.new(1, 0, 0, 64)
+    topBar.BackgroundColor3 = Color3.fromRGB(30, 15, 15)
+    topBar.BorderSizePixel = 0
+    topBar.Parent = main
+
+    local topCorner = Instance.new("UICorner")
+    topCorner.CornerRadius = UDim.new(0, 18)
+    topCorner.Parent = topBar
+
+    local logo = Instance.new("ImageLabel")
+    logo.Size = UDim2.new(0, 30, 0, 30)
+    logo.Position = UDim2.new(0, 16, 0, 17)
+    logo.BackgroundTransparency = 1
+    logo.Image = "rbxassetid://123613996022560"
+    logo.ScaleType = Enum.ScaleType.Fit
+    logo.Parent = topBar
 
     local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, -20, 0, 28)
-    title.Position = UDim2.new(0, 10, 0, 10)
+    title.Size = UDim2.new(1, -200, 1, 0)
+    title.Position = UDim2.new(0, 58, 0, 0)
     title.BackgroundTransparency = 1
     title.Text = "John Doe Hub"
     title.Font = Enum.Font.GothamBold
-    title.TextSize = 18
-    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextSize = 20
+    title.TextColor3 = Color3.fromRGB(255, 110, 110)
     title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = main
+    title.Parent = topBar
 
-    local status = Instance.new("TextLabel")
-    status.Size = UDim2.new(1, -20, 0, 24)
-    status.Position = UDim2.new(0, 10, 0, 42)
-    status.BackgroundTransparency = 1
-    status.Text = "UI đang chạy"
-    status.Font = Enum.Font.Gotham
-    status.TextSize = 13
-    status.TextColor3 = Color3.fromRGB(230, 230, 230)
-    status.Parent = main
+    local version = Instance.new("TextLabel")
+    version.Size = UDim2.new(0, 80, 0, 18)
+    version.Position = UDim2.new(1, -140, 0, 24)
+    version.BackgroundTransparency = 1
+    version.Text = "BETA 3.0"
+    version.Font = Enum.Font.GothamBold
+    version.TextSize = 10
+    version.TextColor3 = Color3.fromRGB(255, 190, 190)
+    version.Parent = topBar
 
-    local toggleBtn = Instance.new("TextButton")
-    toggleBtn.Size = UDim2.new(0, 120, 0, 28)
-    toggleBtn.Position = UDim2.new(0.5, -60, 1, -40)
-    toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 20, 20)
-    toggleBtn.Text = "Ẩn / Hiện"
-    toggleBtn.Font = Enum.Font.GothamBold
-    toggleBtn.TextSize = 12
-    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    toggleBtn.BorderSizePixel = 0
-    toggleBtn.Parent = main
+    local hideBtn = Instance.new("TextButton")
+    hideBtn.Size = UDim2.new(0, 90, 0, 28)
+    hideBtn.Position = UDim2.new(1, -102, 0.5, -14)
+    hideBtn.BackgroundColor3 = Color3.fromRGB(180, 30, 30)
+    hideBtn.Text = "Hide"
+    hideBtn.Font = Enum.Font.GothamBold
+    hideBtn.TextSize = 12
+    hideBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    hideBtn.BorderSizePixel = 0
+    hideBtn.Parent = topBar
 
-    local toggleCorner = Instance.new("UICorner")
-    toggleCorner.CornerRadius = UDim.new(0, 8)
-    toggleCorner.Parent = toggleBtn
+    local hideCorner = Instance.new("UICorner")
+    hideCorner.CornerRadius = UDim.new(0, 8)
+    hideCorner.Parent = hideBtn
 
-    toggleBtn.MouseButton1Click:Connect(function()
+    hideBtn.MouseButton1Click:Connect(function()
         gui.Enabled = not gui.Enabled
     end)
+
+    local tabBar = Instance.new("Frame")
+    tabBar.Size = UDim2.new(1, -20, 0, 36)
+    tabBar.Position = UDim2.new(0, 10, 0, 72)
+    tabBar.BackgroundTransparency = 1
+    tabBar.Parent = main
+
+    local tabLayout = Instance.new("UIListLayout")
+    tabLayout.FillDirection = Enum.FillDirection.Horizontal
+    tabLayout.Padding = UDim.new(0, 8)
+    tabLayout.Parent = tabBar
+
+    local tabs = { "Main", "Sea", "Item", "Settings" }
+    for i, name in ipairs(tabs) do
+        local tabBtn = Instance.new("TextButton")
+        tabBtn.Size = UDim2.new(0, 120, 1, 0)
+        tabBtn.BackgroundColor3 = i == 1 and Color3.fromRGB(255, 90, 90) or Color3.fromRGB(52, 18, 18)
+        tabBtn.Text = name
+        tabBtn.Font = Enum.Font.GothamBold
+        tabBtn.TextSize = 11
+        tabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tabBtn.BorderSizePixel = 0
+        tabBtn.Parent = tabBar
+
+        local tabCorner = Instance.new("UICorner")
+        tabCorner.CornerRadius = UDim.new(0, 8)
+        tabCorner.Parent = tabBtn
+    end
+
+    local searchBox = Instance.new("TextBox")
+    searchBox.Size = UDim2.new(0, 150, 0, 26)
+    searchBox.Position = UDim2.new(1, -165, 0, 80)
+    searchBox.BackgroundColor3 = Color3.fromRGB(48, 18, 18)
+    searchBox.PlaceholderText = "Search"
+    searchBox.Text = ""
+    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+    searchBox.PlaceholderColor3 = Color3.fromRGB(180, 170, 170)
+    searchBox.Font = Enum.Font.Gotham
+    searchBox.TextSize = 12
+    searchBox.BorderSizePixel = 0
+    searchBox.Parent = main
+
+    local searchCorner = Instance.new("UICorner")
+    searchCorner.CornerRadius = UDim.new(0, 8)
+    searchCorner.Parent = searchBox
+
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, -20, 1, -122)
+    content.Position = UDim2.new(0, 10, 0, 112)
+    content.BackgroundColor3 = Color3.fromRGB(26, 14, 14)
+    content.BorderSizePixel = 0
+    content.Parent = main
+
+    local contentCorner = Instance.new("UICorner")
+    contentCorner.CornerRadius = UDim.new(0, 14)
+    contentCorner.Parent = content
+
+    local leftPanel = Instance.new("Frame")
+    leftPanel.Size = UDim2.new(0.62, -10, 1, -20)
+    leftPanel.Position = UDim2.new(0, 10, 0, 10)
+    leftPanel.BackgroundColor3 = Color3.fromRGB(34, 17, 17)
+    leftPanel.BorderSizePixel = 0
+    leftPanel.Parent = content
+
+    local leftCorner = Instance.new("UICorner")
+    leftCorner.CornerRadius = UDim.new(0, 12)
+    leftCorner.Parent = leftPanel
+
+    local leftStroke = Instance.new("UIStroke")
+    leftStroke.Color = Color3.fromRGB(255, 90, 90)
+    leftStroke.Thickness = 1
+    leftStroke.Parent = leftPanel
+
+    local leftTitle = Instance.new("TextLabel")
+    leftTitle.Size = UDim2.new(1, -20, 0, 22)
+    leftTitle.Position = UDim2.new(0, 12, 0, 8)
+    leftTitle.BackgroundTransparency = 1
+    leftTitle.Text = "Status"
+    leftTitle.Font = Enum.Font.GothamBold
+    leftTitle.TextSize = 13
+    leftTitle.TextColor3 = Color3.fromRGB(255, 118, 118)
+    leftTitle.TextXAlignment = Enum.TextXAlignment.Left
+    leftTitle.Parent = leftPanel
+
+    local function makeRow(text, color, yPos)
+        local row = Instance.new("TextButton")
+        row.Size = UDim2.new(1, -20, 0, 28)
+        row.Position = UDim2.new(0, 10, 0, yPos)
+        row.BackgroundColor3 = color
+        row.Text = text
+        row.Font = Enum.Font.GothamSemibold
+        row.TextSize = 12
+        row.TextColor3 = Color3.fromRGB(255, 255, 255)
+        row.BorderSizePixel = 0
+        row.Parent = leftPanel
+
+        local rowCorner = Instance.new("UICorner")
+        rowCorner.CornerRadius = UDim.new(0, 8)
+        rowCorner.Parent = row
+
+        return row
+    end
+
+    makeRow("[ON] Auto Farm", Color3.fromRGB(82, 24, 24), 36)
+    makeRow("[OFF] Auto Quest", Color3.fromRGB(54, 22, 22), 70)
+    makeRow("[OFF] No Clip", Color3.fromRGB(44, 18, 18), 104)
+
+    local rightPanel = Instance.new("Frame")
+    rightPanel.Size = UDim2.new(0.38, -10, 1, -20)
+    rightPanel.Position = UDim2.new(0.62, 0, 0, 10)
+    rightPanel.BackgroundColor3 = Color3.fromRGB(34, 17, 17)
+    rightPanel.BorderSizePixel = 0
+    rightPanel.Parent = content
+
+    local rightCorner = Instance.new("UICorner")
+    rightCorner.CornerRadius = UDim.new(0, 12)
+    rightCorner.Parent = rightPanel
+
+    local rightStroke = Instance.new("UIStroke")
+    rightStroke.Color = Color3.fromRGB(255, 90, 90)
+    rightStroke.Thickness = 1
+    rightStroke.Parent = rightPanel
+
+    local rightTitle = Instance.new("TextLabel")
+    rightTitle.Size = UDim2.new(1, -20, 0, 22)
+    rightTitle.Position = UDim2.new(0, 12, 0, 8)
+    rightTitle.BackgroundTransparency = 1
+    rightTitle.Text = "Quick" 
+    rightTitle.Font = Enum.Font.GothamBold
+    rightTitle.TextSize = 13
+    rightTitle.TextColor3 = Color3.fromRGB(255, 120, 120)
+    rightTitle.TextXAlignment = Enum.TextXAlignment.Left
+    rightTitle.Parent = rightPanel
+
+    local btns = {
+        { "Farm", 26, Color3.fromRGB(170, 30, 30) },
+        { "Mob", 64, Color3.fromRGB(100, 18, 18) },
+        { "Teleport", 102, Color3.fromRGB(70, 24, 24) },
+        { "Reset", 140, Color3.fromRGB(52, 18, 18) }
+    }
+
+    for _, item in ipairs(btns) do
+        local name, yPos, color = item[1], item[2], item[3]
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(1, -20, 0, 28)
+        btn.Position = UDim2.new(0, 10, 0, yPos)
+        btn.BackgroundColor3 = color
+        btn.Text = name
+        btn.Font = Enum.Font.GothamBold
+        btn.TextSize = 12
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.BorderSizePixel = 0
+        btn.Parent = rightPanel
+
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 8)
+        btnCorner.Parent = btn
+    end
 end
+
 
 ensureImmediateMenu()
 
