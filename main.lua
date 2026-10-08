@@ -24,6 +24,73 @@ if not PlayerGui then
     PlayerGui = Player:WaitForChild("PlayerGui", 30)
 end
 
+local function ensureImmediateMenu()
+    if not PlayerGui then return end
+    if PlayerGui:FindFirstChild("JohnDoeImmediateUI") then return end
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "JohnDoeImmediateUI"
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    gui.DisplayOrder = 1000
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    gui.Parent = PlayerGui
+
+    local main = Instance.new("Frame")
+    main.Name = "Main"
+    main.Size = UDim2.new(0, 260, 0, 120)
+    main.Position = UDim2.new(0.5, -130, 0.5, -60)
+    main.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
+    main.BorderSizePixel = 0
+    main.Parent = gui
+    safeMakeCorner and safeMakeCorner(main, 16) or nil
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(255, 90, 90)
+    stroke.Thickness = 1
+    stroke.Parent = main
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -20, 0, 28)
+    title.Position = UDim2.new(0, 10, 0, 10)
+    title.BackgroundTransparency = 1
+    title.Text = "John Doe Hub"
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 18
+    title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = main
+
+    local status = Instance.new("TextLabel")
+    status.Size = UDim2.new(1, -20, 0, 24)
+    status.Position = UDim2.new(0, 10, 0, 42)
+    status.BackgroundTransparency = 1
+    status.Text = "UI đang chạy"
+    status.Font = Enum.Font.Gotham
+    status.TextSize = 13
+    status.TextColor3 = Color3.fromRGB(230, 230, 230)
+    status.Parent = main
+
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size = UDim2.new(0, 120, 0, 28)
+    toggleBtn.Position = UDim2.new(0.5, -60, 1, -40)
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(170, 20, 20)
+    toggleBtn.Text = "Ẩn / Hiện"
+    toggleBtn.Font = Enum.Font.GothamBold
+    toggleBtn.TextSize = 12
+    toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleBtn.BorderSizePixel = 0
+    toggleBtn.Parent = main
+    local toggleCorner = Instance.new("UICorner")
+    toggleCorner.CornerRadius = UDim.new(0, 8)
+    toggleCorner.Parent = toggleBtn
+
+    toggleBtn.MouseButton1Click:Connect(function()
+        gui.Enabled = not gui.Enabled
+    end)
+end
+
+ensureImmediateMenu()
+
 task.spawn(function()
     local remotes = ReplicatedStorage:WaitForChild("Remotes", 15)
     local commF = remotes and remotes:WaitForChild("CommF_", 15)
