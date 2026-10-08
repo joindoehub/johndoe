@@ -126,6 +126,19 @@ local function ensureImmediateMenu()
     local tabs = { "Main", "Sea", "Item", "Settings" }
     local tabButtons = {}
     local selectedTab = "Main"
+    local uiState = {
+        autoFarm = true,
+        autoQuest = false,
+        noClip = false,
+        safeMode = true,
+        debug = false,
+    }
+
+    local function setStatusText(rowButton, enabled, enabledText, disabledText)
+        if not rowButton then return end
+        rowButton.Text = enabled and enabledText or disabledText
+    end
+
     local function setSelectedTab(tabName)
         selectedTab = tabName
         for _, btn in ipairs(tabButtons) do
@@ -276,9 +289,27 @@ local function ensureImmediateMenu()
         return row
     end
 
-    makeRow("[ON] Auto Farm", Color3.fromRGB(82, 24, 24), 36)
-    makeRow("[OFF] Auto Quest", Color3.fromRGB(54, 22, 22), 70)
-    makeRow("[OFF] No Clip", Color3.fromRGB(44, 18, 18), 104)
+    local autoFarmRow = makeRow("[ON] Auto Farm", Color3.fromRGB(82, 24, 24), 36)
+    local autoQuestRow = makeRow("[OFF] Auto Quest", Color3.fromRGB(54, 22, 22), 70)
+    local noClipRow = makeRow("[OFF] No Clip", Color3.fromRGB(44, 18, 18), 104)
+
+    autoFarmRow.MouseButton1Click:Connect(function()
+        uiState.autoFarm = not uiState.autoFarm
+        setStatusText(autoFarmRow, uiState.autoFarm, "[ON] Auto Farm", "[OFF] Auto Farm")
+        print("[John Doe Hub] Auto Farm = " .. tostring(uiState.autoFarm))
+    end)
+
+    autoQuestRow.MouseButton1Click:Connect(function()
+        uiState.autoQuest = not uiState.autoQuest
+        setStatusText(autoQuestRow, uiState.autoQuest, "[ON] Auto Quest", "[OFF] Auto Quest")
+        print("[John Doe Hub] Auto Quest = " .. tostring(uiState.autoQuest))
+    end)
+
+    noClipRow.MouseButton1Click:Connect(function()
+        uiState.noClip = not uiState.noClip
+        setStatusText(noClipRow, uiState.noClip, "[ON] No Clip", "[OFF] No Clip")
+        print("[John Doe Hub] No Clip = " .. tostring(uiState.noClip))
+    end)
 
     local rightPanel = Instance.new("Frame")
     rightPanel.Size = UDim2.new(0.38, -10, 1, -20)
@@ -333,6 +364,18 @@ local function ensureImmediateMenu()
 
         btn.MouseLeave:Connect(function()
             btn.BackgroundColor3 = color
+        end)
+
+        btn.MouseButton1Click:Connect(function()
+            if name == "Farm" then
+                print("[John Doe Hub] Executing Farm")
+            elseif name == "Mob" then
+                print("[John Doe Hub] Executing Mob")
+            elseif name == "Teleport" then
+                print("[John Doe Hub] Executing Teleport")
+            elseif name == "Reset" then
+                print("[John Doe Hub] Executing Reset")
+            end
         end)
 
         local btnCorner = Instance.new("UICorner")
