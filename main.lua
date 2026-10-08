@@ -26,13 +26,19 @@ end
 
 local function ensureImmediateMenu()
     if not PlayerGui then return end
-    if PlayerGui:FindFirstChild("JohnDoeImmediateUI") then return end
+
+    local existing = PlayerGui:FindFirstChild("JohnDoeImmediateUI")
+    if existing then
+        existing.Enabled = true
+        existing.DisplayOrder = 999999
+        return existing
+    end
 
     local gui = Instance.new("ScreenGui")
     gui.Name = "JohnDoeImmediateUI"
     gui.ResetOnSpawn = false
     gui.IgnoreGuiInset = true
-    gui.DisplayOrder = 1000
+    gui.DisplayOrder = 999999
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = PlayerGui
     gui.Enabled = true
@@ -453,6 +459,22 @@ end
 
 
 ensureImmediateMenu()
+
+local function keepForcedUIAlive()
+    while task.wait(1) do
+        if PlayerGui then
+            local forced = PlayerGui:FindFirstChild("JohnDoeImmediateUI")
+            if forced then
+                forced.Enabled = true
+                forced.DisplayOrder = 999999
+            else
+                ensureImmediateMenu()
+            end
+        end
+    end
+end
+
+task.spawn(keepForcedUIAlive)
 
 task.spawn(function()
     local remotes = ReplicatedStorage:WaitForChild("Remotes", 15)
