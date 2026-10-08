@@ -35,6 +35,7 @@ local function ensureImmediateMenu()
     gui.DisplayOrder = 1000
     gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     gui.Parent = PlayerGui
+    gui.Enabled = true
 
     local main = Instance.new("Frame")
     main.Name = "Main"
@@ -43,7 +44,11 @@ local function ensureImmediateMenu()
     main.BackgroundColor3 = Color3.fromRGB(20, 10, 10)
     main.BorderSizePixel = 0
     main.Parent = gui
-    safeMakeCorner and safeMakeCorner(main, 16) or nil
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 16)
+    corner.Parent = main
+
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(255, 90, 90)
     stroke.Thickness = 1
@@ -80,6 +85,7 @@ local function ensureImmediateMenu()
     toggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleBtn.BorderSizePixel = 0
     toggleBtn.Parent = main
+
     local toggleCorner = Instance.new("UICorner")
     toggleCorner.CornerRadius = UDim.new(0, 8)
     toggleCorner.Parent = toggleBtn
