@@ -37,6 +37,19 @@ local function ensureImmediateMenu()
     gui.Parent = PlayerGui
     gui.Enabled = true
 
+    local shadow = Instance.new("Frame")
+    shadow.Name = "Shadow"
+    shadow.Size = UDim2.new(0, 640, 0, 330)
+    shadow.Position = UDim2.new(0.5, -320, 0.5, -165)
+    shadow.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    shadow.BackgroundTransparency = 0.55
+    shadow.BorderSizePixel = 0
+    shadow.Parent = gui
+
+    local shadowCorner = Instance.new("UICorner")
+    shadowCorner.CornerRadius = UDim.new(0, 18)
+    shadowCorner.Parent = shadow
+
     local main = Instance.new("Frame")
     main.Name = "Main"
     main.Size = UDim2.new(0, 620, 0, 310)
@@ -53,6 +66,15 @@ local function ensureImmediateMenu()
     mainStroke.Color = Color3.fromRGB(255, 90, 90)
     mainStroke.Thickness = 1.2
     mainStroke.Parent = main
+
+    local glow = Instance.new("Frame")
+    glow.Name = "Glow"
+    glow.Size = UDim2.new(1, -20, 0, 2)
+    glow.Position = UDim2.new(0, 10, 0, 0)
+    glow.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    glow.BackgroundTransparency = 0.7
+    glow.BorderSizePixel = 0
+    glow.Parent = main
 
     local topBar = Instance.new("Frame")
     topBar.Size = UDim2.new(1, 0, 0, 64)
@@ -92,6 +114,21 @@ local function ensureImmediateMenu()
     version.TextSize = 10
     version.TextColor3 = Color3.fromRGB(255, 190, 190)
     version.Parent = topBar
+
+    local statusPill = Instance.new("TextLabel")
+    statusPill.Size = UDim2.new(0, 72, 0, 18)
+    statusPill.Position = UDim2.new(1, -214, 0, 22)
+    statusPill.BackgroundColor3 = Color3.fromRGB(90, 25, 25)
+    statusPill.Text = "ONLINE"
+    statusPill.Font = Enum.Font.GothamBold
+    statusPill.TextSize = 9
+    statusPill.TextColor3 = Color3.fromRGB(255, 220, 220)
+    statusPill.BorderSizePixel = 0
+    statusPill.Parent = topBar
+
+    local pillCorner = Instance.new("UICorner")
+    pillCorner.CornerRadius = UDim.new(0, 7)
+    pillCorner.Parent = statusPill
 
     local hideBtn = Instance.new("TextButton")
     hideBtn.Size = UDim2.new(0, 90, 0, 28)
@@ -194,6 +231,18 @@ local function ensureImmediateMenu()
             end
         end)
 
+        tabBtn.MouseButton1Down:Connect(function()
+            tabBtn.BackgroundColor3 = Color3.fromRGB(255, 120, 120)
+        end)
+
+        tabBtn.MouseButton1Up:Connect(function()
+            if tabBtn.Name == selectedTab then
+                tabBtn.BackgroundColor3 = Color3.fromRGB(255, 90, 90)
+            else
+                tabBtn.BackgroundColor3 = Color3.fromRGB(52, 18, 18)
+            end
+        end)
+
         tabBtn.MouseButton1Click:Connect(function()
             setSelectedTab(tabBtn.Name)
         end)
@@ -281,6 +330,14 @@ local function ensureImmediateMenu()
             row.BackgroundColor3 = color
         end)
 
+        row.MouseButton1Down:Connect(function()
+            row.BackgroundColor3 = Color3.fromRGB(180, 45, 45)
+        end)
+
+        row.MouseButton1Up:Connect(function()
+            row.BackgroundColor3 = color
+        end)
+
         local rowCorner = Instance.new("UICorner")
         rowCorner.CornerRadius = UDim.new(0, 8)
         rowCorner.Parent = row
@@ -363,6 +420,14 @@ local function ensureImmediateMenu()
         end)
 
         btn.MouseLeave:Connect(function()
+            btn.BackgroundColor3 = color
+        end)
+
+        btn.MouseButton1Down:Connect(function()
+            btn.BackgroundColor3 = Color3.fromRGB(245, 90, 90)
+        end)
+
+        btn.MouseButton1Up:Connect(function()
             btn.BackgroundColor3 = color
         end)
 
